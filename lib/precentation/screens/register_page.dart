@@ -15,8 +15,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   TextEditingController checkPassword = TextEditingController();
   TextEditingController userName = TextEditingController();
   TextEditingController userPassword = TextEditingController();
+  List<String> userCheck = [];
+  @override
+  void initState() {
+    super.initState();
+    getUserCheck();
+  }
 
   final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +57,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 title: CustomButtonTitle.register,
                 onPressed: () async {
                   getRegistration(context);
-                  await saveUserData();
                 },
               ),
             ],
@@ -60,10 +66,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
+  Future<void> getUserCheck() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    userCheck = prefs.getStringList('userCheck') ?? [];
+  }
+
   Future<void> saveUserData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('userName', userName.text);
     await prefs.setString('userPassword', userPassword.text);
+    userCheck.add(userName.text);
+    await prefs.setStringList('userCheck', userCheck);
   }
 
   String? passwordsCheck(String? value) {
@@ -95,11 +108,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         ),
       );
     }
+    await saveUserData();
   }
 
   String? checkName(String? value) {
     if (value == null || value.isEmpty) {
       return 'Поле не может быть пустым';
+    } else if (userCheck.contains(value)) {
+      return 'Такой пользователь уже существует';
     }
     return null;
   }

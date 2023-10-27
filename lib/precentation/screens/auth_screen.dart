@@ -1,5 +1,7 @@
 import 'package:auth_neobis_app/precentation/common_widgets/auth_text_form_field.dart';
 import 'package:auth_neobis_app/precentation/common_widgets/custom_button.dart';
+import 'package:auth_neobis_app/precentation/common_widgets/get_registration_button.dart';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,10 +17,13 @@ class _AuthPAgeState extends State<AuthPAge> {
   String? userPaasword;
   final _formKey = GlobalKey<FormState>();
   @override
+  void initState() {
+    super.initState();
+    getUserData();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    setState(() {
-      getUserData();
-    });
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(25),
@@ -34,7 +39,7 @@ class _AuthPAgeState extends State<AuthPAge> {
               ),
               CustomTextFormField(
                 hintText: CustomTextFormFieldHint.password,
-                validate: validateName,
+                validate: validatePassword,
                 controller: TextEditingController(),
               ),
               CustomButton(
@@ -43,6 +48,7 @@ class _AuthPAgeState extends State<AuthPAge> {
                   getAuth(context);
                 },
               ),
+              const GetRegistrationButton(),
             ],
           ),
         ),
@@ -52,6 +58,13 @@ class _AuthPAgeState extends State<AuthPAge> {
 
   String? validateName(String? value) {
     if (value == null || value.isEmpty || value != userName) {
+      return 'Неверное имя или пароль';
+    }
+    return null;
+  }
+
+  String? validatePassword(String? value) {
+    if (value == null || value.isEmpty || value != userPaasword) {
       return 'Неверное имя или пароль';
     }
     return null;
